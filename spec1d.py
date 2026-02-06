@@ -1,11 +1,11 @@
 __version__ = 0.1
 
 import os
-import utils
 import numpy as np
 import pyneb as pn
 import pandas as pd
 
+from . import utils
 from tqdm import tqdm
 from astropy.io import fits
 from ifscube.stats import line_flux_error
