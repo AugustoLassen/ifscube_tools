@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ifscube_tools",
-    version="0.1",
+    version="0.1.1",
     packages=find_packages(),  # automatically finds ifscube_tools
     install_requires=[
         "numpy",

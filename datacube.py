@@ -8,8 +8,11 @@ import pandas as pd
 from . import utils
 from tqdm import tqdm
 from astropy.io import fits
+from astropy import constants as const
 from ifscube.stats import line_flux_error
 from uncertainties import ufloat, umath, unumpy
+
+c = const.c.to("km/s").value
 
 class Datacube:
     def __init__(self, fpath, **kwargs):
