@@ -174,7 +174,7 @@ class Datacube:
         return snr
     
     def get_ebv_map(self, ha_alias="ha", hb_alias="hb",
-                    snr_min_ha=5., snr_min_hb=5., reddening_law="CCM89",
+                    snr_min_ha=3., snr_min_hb=3., reddening_law="CCM89",
                     Rv=3.1, balmer_dec=2.863):
         
         ### Instantiate reddening correction PyNeb object
@@ -186,8 +186,10 @@ class Datacube:
         snr_ha, snr_hb = snr[ha_alias], snr[hb_alias]
         
         ### Initialize output arrays
-        ebv = np.full(snr_ha.shape, np.nan)
-        uebv = np.full_like(ebv, np.nan)
+        # ebv = np.full(snr_ha.shape, np.nan)
+        # uebv = np.full_like(ebv, np.nan)
+        ebv = np.full(snr_ha.shape, 0.)
+        uebv = np.full_like(ebv, 0.)
 
         ### Define mask based on minimum SNR
         mask_snr = np.logical_or(snr_ha < snr_min_ha, snr_hb < snr_min_hb)
