@@ -63,7 +63,7 @@ class Datacube:
 
         return keynames
     
-    def get_gaussian_moments(self, line, prop="v"):
+    def get_gaussian_moments(self, line):
         ### Validate emission line alias
         assert np.isin(line, self.featwl.feature), \
             f"Line {line} was not found among emission line aliases"
