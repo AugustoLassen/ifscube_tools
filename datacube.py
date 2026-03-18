@@ -8,6 +8,7 @@ import pandas as pd
 from . import utils
 from tqdm import tqdm
 from astropy.io import fits
+from scipy.stats import kurtosis
 from astropy import constants as const
 from ifscube.stats import line_flux_error
 from uncertainties import ufloat, umath, unumpy
@@ -269,3 +270,28 @@ class Datacube:
 
         del df
         return df_rc
+    
+    def calc_kurtosis(self, line, window_size=30.):
+        # Select a window to cut-out a given spectral interval around the line of interest
+        kurt_values = np.zeros(self.fitspec.shape[1:], dtype=np.float32)
+        ylist, xlist = ylist, xlist=np.where(~self.mask2d)
+
+        for ix, iy in tqdm(zip(xlist, ylist),
+                        desc="Calculating kurtosis for each unmasked spaxel",
+                        total=xlist.size):
+            all_lines=self.emlines_at_xy(ix,iy)
+            line_props=all_lines.loc[all_lines["line"] == line].squeeze()
+
+            # Use dervied velocity to shift line center
+            l0 = line_props["wave"] + line_props["wave"] * line_props["v"]/c
+            lmin = l0 - window_size
+            lmax = l0 + window_size
+
+            # Select the wavelength window
+            wave_mask1d = np.logical_and(self.restwave >= lmin, self.restwave <= lmax)
+            line_cutout=self.fitspec[wave_mask1d, iy, ix]
+            
+            # Kurtosis value at that particular spaxel
+            kurt_values[iy, ix] = kurtosis(line_cutout)
+
+        return kurt_values
