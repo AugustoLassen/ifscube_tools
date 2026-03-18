@@ -271,14 +271,13 @@ class Datacube:
         del df
         return df_rc
     
-    def calc_kurtosis(self, line, window_size=30.):
+    def calc_kurtosis(self, line, window_size=30., **kwargs):
         # Select a window to cut-out a given spectral interval around the line of interest
-        kurt_values = np.zeros(self.fitspec.shape[1:], dtype=np.float32)
-        ylist, xlist = ylist, xlist=np.where(~self.mask2d)
+        kurt_values = np.full(self.fitspec.shape[1:], np.nan, dtype=np.float32)
 
-        for ix, iy in tqdm(zip(xlist, ylist),
-                        desc="Calculating kurtosis for each unmasked spaxel",
-                        total=xlist.size):
+        ylist, xlist = np.where(~self.mask2d)
+        for iy, ix in tqdm(zip(ylist, xlist), total=ylist.size,
+                           desc="Calculating kurtosis per spaxel"):
             all_lines=self.emlines_at_xy(ix,iy)
             line_props=all_lines.loc[all_lines["line"] == line].squeeze()
 
@@ -292,6 +291,6 @@ class Datacube:
             line_cutout=self.fitspec[wave_mask1d, iy, ix]
             
             # Kurtosis value at that particular spaxel
-            kurt_values[iy, ix] = kurtosis(line_cutout)
+            kurt_values[iy, ix] = kurtosis(line_cutout, **kwargs)
 
         return kurt_values
