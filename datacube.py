@@ -62,6 +62,15 @@ class Datacube:
         else: self.mask2d = np.zeros(self.fitspec.shape[1:], dtype=bool)
 
         return keynames
+    
+    def get_gaussian_moments(self, line, prop="v"):
+        ### Validate emission line alias
+        assert np.isin(line, self.featwl.feature), \
+            f"Line {line} was not found among emission line aliases"
+
+        A, v, sig_v = self.solution[self.parnames.component == line, :, :]
+
+        return A, v, sig_v
 
     def get_gaussian_lineflux(self, line, dust_corr=False):
         ### Validate emission line alias
