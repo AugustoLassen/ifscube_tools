@@ -52,3 +52,5 @@ def FWHM_MUSE(lmb, out_type="fwhm", out_unit="AA"):
         else: x *= np.divide(c, lmb)
     
     return x
+
+print("hello world")
