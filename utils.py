@@ -2,6 +2,7 @@ __version__ = 0.1
 
 import numpy as np
 from astropy import constants as const
+from scipy.stats import norm, kurtosis
 
 c = const.c.to("km/s").value
 
@@ -53,4 +54,64 @@ def FWHM_MUSE(lmb, out_type="fwhm", out_unit="AA"):
     
     return x
 
-print("Hello world!!!!!")
+def get_kurtosis(sp, lmb, peak_lmd, FWHM, flux):
+    '''
+    Calculate the kurtosis of the spectral line by defining the window such that the Gaussian fit of the line has kurtosis = 0.
+    
+    Parameters:
+    ----------
+    sp: array
+        The observed spectrum including a surrounding window.
+        
+    lmb: array
+        The wavelengths corresponding to the spectrum in Ångströms.
+        
+    peak_lmd: float
+        The wavelength of the peak of the Gaussian fit.
+        
+    FWHM: float
+        The FWHM of the Gaussian fit.
+    
+    flux: float
+        The flux of the Gaussian fit.
+
+    Returns
+    -------
+    float
+        The kurtosis of the observed spectrum.
+
+    '''
+    
+    #Starting with a window 2*FWHM
+    window_right = peak_lmd + 2*FWHM
+    window_left = peak_lmd - 2*FWHM
+    
+    #Arbitrary value
+    kurt_gauss = 10
+    n = 0
+    
+    
+    while abs(kurt_gauss) > 0.1: 
+        n += 1
+        
+        
+        window_right += 0.1
+        window_left -= 0.1
+        
+        x = np.arange(window_left, window_right, 0.2)
+        gauss_OIII_ = norm.pdf(x, peak_lmd, FWHM/2.355) * flux
+    
+        kurtosis_gauss = kurtosis(gauss_OIII_)
+        
+        ind_min = np.argmin(abs(lmb - window_left))
+        ind_max = np.argmin(abs(lmb - window_right))
+        
+        kurt = kurtosis(sp[ind_min:ind_max])
+        
+        # print(kurtosis_gauss)
+        
+        kurt_gauss = kurtosis_gauss
+        
+        if n == 50:
+            break
+    return(kurt)
